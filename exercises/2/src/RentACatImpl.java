@@ -15,8 +15,16 @@ public class RentACatImpl implements RentACat {
 	 * @return true if cat exists and was rented out, false otherwise
 	 */
 
-	public boolean returnCat(int id) {
-		// TODO
+	public boolean returnCat(int id) 
+	{
+		for (Cat c : cats)
+		{
+			if (c.getId() == id && c.getRented()) // If the cat with the id exists in the list of cats and has been rented out
+			{
+				c.returnCat(); // raise flag
+				return true; 
+			}
+		}
 		return false;
 	}
 
@@ -30,8 +38,16 @@ public class RentACatImpl implements RentACat {
 	 * @return true if cat exists and was not rented out, false otherwise
 	 */
 
-	public boolean rentCat(int id) {
-		// TODO
+	public boolean rentCat(int id) 
+	{
+		for (Cat c : cats)
+		{
+			if (c.getId() == id && !c.getRented())
+			{
+				c.rentCat(); // raise flag
+				return true;
+			}
+		}
 		return false;
 	}
 
@@ -45,9 +61,18 @@ public class RentACatImpl implements RentACat {
 	 * @return "\n"-delimited list of rentable cats
 	 */
 
-	public String listCats() {
-		// TODO
-		return "WRITE CODE FOR THIS";
+	public String listCats() 
+	{
+		String listCats = new String(); 
+		for (Cat c : cats)
+		{
+			if (!c.getRented())
+			{
+				listCats += c + "\n";
+				
+			}
+		}
+		return listCats;
 	}
 
 	/**
@@ -59,8 +84,15 @@ public class RentACatImpl implements RentACat {
 	 * @return true if cat exists in list, false otherwise
 	 */
 
-	public boolean catExists(int id) {
-		// TODO
+	public boolean catExists(int id) 
+	{
+		for (Cat c: cats)
+		{
+			if (id == c.getId())
+			{
+				return true;
+			}
+		}
 		return false;
 	}
 
@@ -131,7 +163,8 @@ public class RentACatImpl implements RentACat {
 	 * @param c the Cat to add
 	 */
 
-	public void addCat(Cat c) {
+	public void addCat(Cat c) 
+	{
 		cats.add(c);
 	}
 
