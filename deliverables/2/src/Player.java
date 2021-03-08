@@ -50,7 +50,8 @@ class Player {
 	}
 	
 	// Return the string describing all the items in the inventory
-	public String getInventoryString() {
+	public String getInventoryString() 
+	{
 		if (Config.getBuggyPlayer()) {
 			throw new UnsupportedOperationException("Injected bug for Player class");
 		}

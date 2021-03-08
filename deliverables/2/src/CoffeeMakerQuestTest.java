@@ -1,11 +1,17 @@
+
 import static org.junit.Assert.*;
 
 import org.junit.Test;
 import org.junit.*;
 import org.mockito.*;
+
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+
 import static org.mockito.Mockito.*;
 
-public class CoffeeMakerQuestTest {
+public class CoffeeMakerQuestTest 
+{
 
 	CoffeeMakerQuest cmq;
 	Player player;
@@ -17,26 +23,58 @@ public class CoffeeMakerQuestTest {
 	Room room6;	// Rough room
 
 	@Before
-	public void setup() {
+	public void setup() 
+	{
 		// 0. Turn on bug injection for Player and Room.
 		Config.setBuggyPlayer(true);
 		Config.setBuggyRoom(true);
 		
 		// 1. Create the Coffee Maker Quest object and assign to cmq.
 		cmq = CoffeeMakerQuest.createInstance();
-
-		// TODO: 2. Create a mock Player and assign to player and call cmq.setPlayer(player). 
+		// 2. Create a mock Player and assign to player and call cmq.setPlayer(player). 
 		// Player should not have any items (no coffee, no cream, no sugar)
-
-		// TODO: 3. Create mock Rooms and assign to room1, room2, ..., room6.
+		player = mock(Player.class); 
+		cmq.setPlayer(player);
+		// 3. Create mock Rooms and assign to room1, room2, ..., room6.
 		// Mimic the furnishings / adjectives / items of the rooms in the original Coffee Maker Quest.
-		
-		// TODO: 4. Add the rooms created above to mimic the layout of the original Coffee Maker Quest.
+		room1 = mock(Room.class);
+		when(room1.getFurnishing()).thenReturn("Quaint sofa");
+		when(room1.getAdjective()).thenReturn("Small");
+		when(room1.getItem()).thenReturn(Item.CREAM);
+		room2 = mock(Room.class);
+		when(room2.getFurnishing()).thenReturn("Sad record player");
+		when(room2.getAdjective()).thenReturn("Funny");
+		when(room2.getItem()).thenReturn(Item.NONE);
+		room3 = mock(Room.class);
+		when(room3.getFurnishing()).thenReturn("Tight pizza");
+		when(room3.getAdjective()).thenReturn("Refinanced");
+		when(room3.getItem()).thenReturn(Item.COFFEE);
+		room4 = mock(Room.class);
+		when(room4.getFurnishing()).thenReturn("Flat energy drink");
+		when(room4.getAdjective()).thenReturn("Dumb");
+		when(room4.getItem()).thenReturn(Item.NONE);
+		room5 = mock(Room.class);
+		when(room5.getFurnishing()).thenReturn("Beautiful bag of money");
+		when(room5.getAdjective()).thenReturn("Bloodthirsty");
+		when(room5.getItem()).thenReturn(Item.NONE);
+		room6 = mock(Room.class);
+		when(room6.getFurnishing()).thenReturn("Perfect air hockey table");
+		when(room6.getAdjective()).thenReturn("Rough");
+		when(room6.getItem()).thenReturn(Item.SUGAR);
+		// 4. Add the rooms created above to mimic the layout of the original Coffee Maker Quest.
+		cmq.addFirstRoom(room1);
+		cmq.addRoomAtNorth(room2, "Refinanced room", "Small room");
+		cmq.addRoomAtNorth(room3, "Dumb room", "Funny room");
+		cmq.addRoomAtNorth(room4, "Bloodthirsty room", "Refinanced room");
+		cmq.addRoomAtNorth(room5, "Rough room", "Dumb room");
+		cmq.addRoomAtNorth(room6, "Small room", "Bloodthirsty room"); 
 		
 	}
 
 	@After
-	public void tearDown() {
+	public void tearDown() 
+	{
+		
 	}
 	
 	/**
@@ -46,8 +84,10 @@ public class CoffeeMakerQuestTest {
 	 * Postconditions: Return value is " INSTRUCTIONS (N,S,L,I,D,H) > ".
 	 */
 	@Test
-	public void testGetInstructionsString() {
-		// TODO
+	public void testGetInstructionsString()
+	{
+		String test = cmq.getInstructionsString();
+		assertEquals(test," INSTRUCTIONS (N,S,L,I,D,H) >");
 	}
 	
 	/**
@@ -58,8 +98,11 @@ public class CoffeeMakerQuestTest {
 	 * Postconditions: Return value is false.
 	 */
 	@Test
-	public void testAddFirstRoom() {
-		// TODO
+	public void testAddFirstRoom() 
+	{
+		Room myRoom = mock(Room.class); 
+		boolean test = cmq.addFirstRoom(myRoom); 
+		assertFalse(test); 
 	}
 	
 	/**
@@ -72,8 +115,15 @@ public class CoffeeMakerQuestTest {
 	 *                 myRoom.setSouthDoor("South") is called.
 	 */
 	@Test
-	public void testAddRoomAtNorthUnique() {
-		// TODO
+	public void testAddRoomAtNorthUnique() 
+	{
+		Room myRoom = mock(Room.class);
+		when(myRoom.getFurnishing()).thenReturn("Fake bed");
+		when(myRoom.getItem()).thenReturn(null);
+		boolean test = cmq.addRoomAtNorth(myRoom, "North", "South"); 
+		assertTrue(test); 
+		verify(room6, Mockito.atLeastOnce()).setNorthDoor("North");
+		verify(myRoom, Mockito.atLeastOnce()).setSouthDoor("South");
 	}
 	
 	/**
@@ -86,8 +136,15 @@ public class CoffeeMakerQuestTest {
 	 *                 myRoom.setSouthDoor("South") is not called.
 	 */
 	@Test
-	public void testAddRoomAtNorthDuplicate() {
-		// TODO
+	public void testAddRoomAtNorthDuplicate() 
+	{
+		Room myRoom = mock(Room.class);
+		when(myRoom.getFurnishing()).thenReturn("Flat energy drink");
+		when(myRoom.getItem()).thenReturn(null);
+		boolean test = cmq.addRoomAtNorth(myRoom, "North", "South"); 
+		assertFalse(test);
+		verify(room6, Mockito.never()).setNorthDoor("North");
+		verify(myRoom, Mockito.never()).setSouthDoor("South");
 	}
 	
 	/**
@@ -98,8 +155,11 @@ public class CoffeeMakerQuestTest {
 	 * Postconditions: Return value is null.
 	 */
 	@Test
-	public void testGetCurrentRoom() {
-		// TODO
+	public void testGetCurrentRoom() 
+	{
+		Room test = mock(Room.class); 
+		test = cmq.getCurrentRoom();
+		assertEquals(test, null);
 	}
 	
 	/**
@@ -112,8 +172,12 @@ public class CoffeeMakerQuestTest {
 	 *                 Return value of cmq.getCurrentRoom() is room3.
 	 */
 	@Test
-	public void testSetCurrentRoom() {
-		// TODO
+	public void testSetCurrentRoom() 
+	{
+		boolean test = cmq.setCurrentRoom(room3);
+		Room testRoom = cmq.getCurrentRoom();
+		assertTrue(test);
+		assertEquals(testRoom, room3); 
 	}
 	
 	/**
@@ -123,8 +187,11 @@ public class CoffeeMakerQuestTest {
 	 * Postconditions: Return value is "YOU HAVE NO COFFEE!\nYOU HAVE NO CREAM!\nYOU HAVE NO SUGAR!\n".
 	 */
 	@Test
-	public void testProcessCommandI() {
-		// TODO
+	public void testProcessCommandI() 
+	{
+		when(player.getInventoryString()).thenReturn("YOU HAVE NO COFFEE!\nYOU HAVE NO CREAM!\nYOU HAVE NO SUGAR!\n");
+		String test = cmq.processCommand("I");
+		assertEquals(test, "YOU HAVE NO COFFEE!\nYOU HAVE NO CREAM!\nYOU HAVE NO SUGAR!\n");
 	}
 	
 	/**
@@ -136,8 +203,12 @@ public class CoffeeMakerQuestTest {
 	 *                 player.addItem(Item.CREAM) is called.
 	 */
 	@Test
-	public void testProcessCommandLCream() {
-		// TODO
+	public void testProcessCommandLCream() 
+	{
+		cmq.setCurrentRoom(room1);
+		String test = cmq.processCommand("l");
+		assertEquals(test, "There might be something here...\nYou found some creamy cream!\n");
+		verify(player, Mockito.times(1)).addItem(Item.CREAM);
 	}
 	
 	/**
@@ -150,8 +221,13 @@ public class CoffeeMakerQuestTest {
 	 *                 Return value of cmq.getCurrentRoom() is room5.
 	 */
 	@Test
-	public void testProcessCommandN() {
-		// TODO
+	public void testProcessCommandN() 
+	{
+		cmq.setCurrentRoom(room4);
+		String test = cmq.processCommand("n");
+		Room testRoom = cmq.getCurrentRoom();
+		assertEquals(test,"");
+		assertEquals(testRoom, room5);
 	}
 	
 	/**
@@ -164,8 +240,13 @@ public class CoffeeMakerQuestTest {
 	 *                 Return value of cmq.getCurrentRoom() is room1.
 	 */
 	@Test
-	public void testProcessCommandS() {
-		// TODO
+	public void testProcessCommandS() 
+	{
+		cmq.setCurrentRoom(room1);
+		String test = cmq.processCommand("s");
+		Room testRoom = cmq.getCurrentRoom(); 
+		assertEquals(test,"A door in that direction does not exist.\n");
+		assertEquals(testRoom, room1);
 	}
 	
 	/**
@@ -177,8 +258,12 @@ public class CoffeeMakerQuestTest {
 	 *                 Return value of cmq.isGameOver() is true.
 	 */
 	@Test
-	public void testProcessCommandDLose() {
-		// TODO
+	public void testProcessCommandDLose() 
+	{
+		String test = cmq.processCommand("D");
+		boolean testBool = cmq.isGameOver();
+		assertEquals(test, "YOU HAVE NO COFFEE!\nYOU HAVE NO CREAM!\nYOU HAVE NO SUGAR!\n\nYou drink the air, as you have no coffee, sugar, or cream.\nThe air is invigorating, but not invigorating enough. You cannot study.\nYou lose!\n" );
+		assertTrue(testBool);
 	}
 	
 	/**
@@ -190,8 +275,97 @@ public class CoffeeMakerQuestTest {
 	 *                 Return value of cmq.isGameOver() is true.
 	 */
 	@Test
-	public void testProcessCommandDWin() {
-		// TODO
+	public void testProcessCommandDWin() 
+	{
+		when(player.checkCoffee()).thenReturn(true);
+		when(player.checkCream()).thenReturn(true);
+		when(player.checkSugar()).thenReturn(true);
+		Boolean testBool = cmq.isGameOver();
+		assertTrue(testBool);	
+		assertEquals(cmq.processCommand("D"), "You have a cup of delicious coffee.\nYou have some fresh cream.\nYou have some tasty sugar.\nYou drink the beverage and are ready to study!\nYou win!\n");	
+	}
+	
+	/**
+	 * Test case for displayHelp()
+	 * Preconditions: none
+	 * Execution steps: Call cmq.processCommand("H")
+	 * Postconditions: Return value of cmq.processCommand("H") is " N - Moves the player north if there is an available room.
+																	S - Moves the player south if there is an available room.
+																	L - Look for items in your current room.
+																	I - Access your inventory of items currently possessed.
+																	D - Drink the mixture to decide the fate of your quest...
+																	H - Help "															
+	 */
+	@Test
+	public void testDisplayHelp()
+	{
+		String test = cmq.processCommand("H");
+		assertEquals(test,"N - Moves the player north if there is an available room.\nS - Moves the player south if there is an available room.\nL - Look for items in your current room.\nI - Access your inventory of items currently possessed.\nD - Drink the mixture to decide the fate of your quest...\nH - Help \n");
+	}
+	@Test
+	public void checkPlayerOnlySugar()
+	{
+		when(player.checkCoffee()).thenReturn(false);
+		when(player.checkCream()).thenReturn(false);
+		when(player.checkSugar()).thenReturn(true);
+		assertEquals(cmq.processCommand("D"), "\nYOU HAVE NO COFFEE!\nYOU HAVE NO CREAM!\nYou have some tasty sugar.\nYou drink the air, as you have no coffee, or cream.\nThe air is invigorating, but not invigorating enough. You cannot study.\nYou lose!\n");
+	}
+	@Test
+	public void checkPlayerOnlyCoffee()
+	{
+		when(player.checkCoffee()).thenReturn(true);
+		when(player.checkCream()).thenReturn(false);
+		when(player.checkSugar()).thenReturn(false);
+		assertEquals(cmq.processCommand("D"), "You have a cup of delicious coffee.\nYOU HAVE NO CREAM!\nYOU HAVE NO SUGAR!\n\nYou drink the air, as you have no sugar, or cream.\nThe air is invigorating, but not invigorating enough. You cannot study.\nYou lose!\n");
+	}
+	@Test
+	public void checkPlayerOnlyCream()
+	{
+		when(player.checkCoffee()).thenReturn(false);
+		when(player.checkCream()).thenReturn(true);
+		when(player.checkSugar()).thenReturn(false);
+		assertEquals(cmq.processCommand("D"), "YOU HAVE NO COFFEE!\nYou have some fresh cream.\nYOU HAVE NO SUGAR!\n\nYou drink the air, as you have no coffee, or sugar.\nThe air is invigorating, but not invigorating enough. You cannot study.\nYou lose!\n");
+	}
+	@Test
+	public void checkPlayerOnlyCoffeeAndCream()
+	{
+		when(player.checkCoffee()).thenReturn(true);
+		when(player.checkCream()).thenReturn(true);
+		when(player.checkSugar()).thenReturn(false);
+		assertEquals(cmq.processCommand("D"), "You have a cup of delicious coffee.\nYou have some fresh cream.\nYOU HAVE NO SUGAR!\n\nYou drink the air, as you have no sugar.\nThe air is invigorating, but not invigorating enough. You cannot study.\nYou lose!\n");
+	}
+	@Test
+	public void checkPlayerOnlyCoffeeAndSugar()
+	{
+		when(player.checkCoffee()).thenReturn(true);
+		when(player.checkCream()).thenReturn(false);
+		when(player.checkSugar()).thenReturn(true);
+		assertEquals(cmq.processCommand("D"), "You have a cup of delicious coffee.\nYOU HAVE NO CREAM!\nYou have some tasty sugar.\n\nYou drink the air, as you have no cream.\nThe air is invigorating, but not invigorating enough. You cannot study.\nYou lose!\n");
+	}
+	@Test
+	public void checkPlayerOnlyCreamAndSugar()
+	{
+		when(player.checkCoffee()).thenReturn(false);
+		when(player.checkCream()).thenReturn(true);
+		when(player.checkSugar()).thenReturn(true);
+		assertEquals(cmq.processCommand("D"), "YOU HAVE NO COFFEE!\nYou have some fresh cream.\nYou have some tasty sugar.\n\nYou drink the air, as you have no coffee. \nThe air is invigorating, but not invigorating enough. You cannot study.\nYou lose!\n");
+	}
+	/**
+	 * Test case for private doorDoesNotExist()
+	 * Precondtions: none
+	 * Executionsteps: returnValue = doorDoesNotExist()
+	 * Postconditions: return value should equal 
+	 * @throws InvocationTargetException 
+	 * @throws IllegalArgumentException 
+	 * @throws IllegalAccessException 
+	 */
+	@Test
+	public void testPrivate() throws IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException, SecurityException
+	{
+		Method doorDoesNotExistMethod = CoffeeMakerQuestImpl.class.getDeclaredMethod("doorDoesNotExist");
+		doorDoesNotExistMethod.setAccessible(true);
+		String returnValue = (String) doorDoesNotExistMethod.invoke(cmq, "doorDoesNotExist");
+		assertEquals(returnValue, "A door in that direction does not exist!\n");
 	}
 	
 	// TODO: Put in more unit tests of your own making to improve coverage!
