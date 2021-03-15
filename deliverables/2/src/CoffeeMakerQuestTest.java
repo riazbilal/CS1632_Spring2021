@@ -367,7 +367,9 @@ public class CoffeeMakerQuestTest
 		String returnValue = (String) doorDoesNotExistMethod.invoke(cmq, "doorDoesNotExist");
 		assertEquals(returnValue, "A door in that direction does not exist!\n");
 	}
-	
-	// TODO: Put in more unit tests of your own making to improve coverage!
-	
+	@Test
+	public void testAddFirstRoomNull()
+	{
+		assertFalse(cmq.addFirstRoom(null));
+	}
 }

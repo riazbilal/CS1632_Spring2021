@@ -26,7 +26,8 @@ public class Game {
 		Scanner scanner = new Scanner(System.in);
 		
 		// Main game loop
-		while(cmq.isGameOver() == false) {
+		while(cmq.isGameOver() == false) 
+		{
 			System.out.println(cmq.getCurrentRoom().getDescription());
 			System.out.println(cmq.getInstructionsString());
 			
@@ -35,5 +36,6 @@ public class Game {
 			System.out.println(response);
 		}
 		scanner.close();
+		
 	}
 }
